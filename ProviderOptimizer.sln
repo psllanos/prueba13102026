@@ -11,6 +11,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{AF9287BE
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProviderOptimizer.UnitTests", "tests\ProviderOptimizer.UnitTests\ProviderOptimizer.UnitTests.csproj", "{A6AEF2B0-641B-45DF-BC9A-A33FE35D09E0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProviderOptimizer.Application", "src\ProviderOptimizer.Application\ProviderOptimizer.Application.csproj", "{2EF843FF-C9FB-41ED-A259-620CC00411CF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -28,9 +30,14 @@ Global
 		{A6AEF2B0-641B-45DF-BC9A-A33FE35D09E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A6AEF2B0-641B-45DF-BC9A-A33FE35D09E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A6AEF2B0-641B-45DF-BC9A-A33FE35D09E0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2EF843FF-C9FB-41ED-A259-620CC00411CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2EF843FF-C9FB-41ED-A259-620CC00411CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2EF843FF-C9FB-41ED-A259-620CC00411CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2EF843FF-C9FB-41ED-A259-620CC00411CF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{C216E69C-560F-4EBD-AEA0-AFCED21BB12A} = {27C17724-4C8B-483E-8CC5-3995EB5B537E}
 		{A6AEF2B0-641B-45DF-BC9A-A33FE35D09E0} = {AF9287BE-C1C5-4FC7-98CA-7158EE674C9C}
+		{2EF843FF-C9FB-41ED-A259-620CC00411CF} = {27C17724-4C8B-483E-8CC5-3995EB5B537E}
 	EndGlobalSection
 EndGlobal

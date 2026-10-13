@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>ProviderOptimizer.Application</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../ProviderOptimizer.Domain/ProviderOptimizer.Domain.csproj" />
+  </ItemGroup>
+
+</Project>
