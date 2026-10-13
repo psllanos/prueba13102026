@@ -37,9 +37,9 @@ Chain strategy: stacked-to-main
 
 ## Phase 2: Application Use Cases
 
-- [ ] 2.1 Create `src/ProviderOptimizer.Application/Ports/` with `IProviderRepository`, `IAssistanceCaseRepository` and `IClock`
-- [ ] 2.2 Implement `src/ProviderOptimizer.Application/OptimizeProviderHandler.cs`: candidates, scoring, case plus decision in one transaction
-- [ ] 2.3 Implement `src/ProviderOptimizer.Application/ListAvailableProvidersHandler.cs` reusing candidate lookup only
+- [x] 2.1 Create `src/ProviderOptimizer.Application/Ports/` with `IProviderRepository`, `IAssistanceCaseRepository` and `IClock`
+- [x] 2.2 Implement `src/ProviderOptimizer.Application/OptimizeProviderHandler.cs`: candidates, scoring, case plus decision in one transaction
+- [x] 2.3 Implement `src/ProviderOptimizer.Application/ListAvailableProvidersHandler.cs` reusing candidate lookup only
 
 ## Phase 3: Infrastructure and API
 
@@ -54,7 +54,7 @@ Chain strategy: stacked-to-main
 ## Phase 4: Tests
 
 - [x] 4.1 Unit tests in `tests/ProviderOptimizer.UnitTests/ProviderScoringPolicyTests.cs` covering every provider-scoring scenario
-- [ ] 4.2 Unit tests in `tests/ProviderOptimizer.UnitTests/ProviderDiscoveryTests.cs` covering every provider-discovery scenario
+- [x] 4.2 Unit tests in `tests/ProviderOptimizer.UnitTests/ProviderDiscoveryTests.cs` covering every provider-discovery scenario
 - [ ] 4.3 Add `tests/ProviderOptimizer.IntegrationTests/OptimizerApiFactory.cs` with `WebApplicationFactory` and a Testcontainers Postgres
 - [ ] 4.4 Integration test `tests/ProviderOptimizer.IntegrationTests/OptimizeEndpointTests.cs`: persistence, the 409 path and the 400 path
 - [ ] 4.5 Integration test `tests/ProviderOptimizer.IntegrationTests/AvailableProvidersEndpointTests.cs`: filtering and stable order
