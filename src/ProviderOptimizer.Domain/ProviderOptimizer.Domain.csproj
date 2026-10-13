@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>ProviderOptimizer.Domain</RootNamespace>
+    <!-- Dependency rule: Domain references no other project and no infrastructure package. -->
+  </PropertyGroup>
+
+</Project>
