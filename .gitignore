@@ -19,9 +19,13 @@ coverage*.xml
 appsettings.*.local.json
 *.pfx
 
-# Node (reserved for the React client, out of scope for this change)
+# Exercise brief: recruitment material, deliberately not published with the solution
+PRUEBA T*.pdf
+
+# Node (the optional React client lives in frontend/)
 node_modules/
 dist/
+*.tsbuildinfo
 
 # IDE and OS
 .vs/
