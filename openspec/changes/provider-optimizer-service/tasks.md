@@ -50,24 +50,24 @@ gated by the 400-line default.
 - [x] 3.1 Map providers, cases and decisions in `src/ProviderOptimizer.Infrastructure/Persistence/OptimizerDbContext.cs`
 - [x] 3.2 Implement `src/ProviderOptimizer.Infrastructure/Persistence/ProviderRepository.cs` for both repository ports
 - [x] 3.3 Generate the initial schema migration in `src/ProviderOptimizer.Infrastructure/Migrations/`
-- [ ] 3.4 Build `src/ProviderOptimizer.Api/Program.cs` as composition root, applying migrations on startup
-- [ ] 3.5 Add request and response DTOs in `src/ProviderOptimizer.Api/Contracts/`
-- [ ] 3.6 Add `src/ProviderOptimizer.Api/Endpoints/OptimizeEndpoint.cs` for `POST /optimize` returning 200, 400 and 409
-- [ ] 3.7 Add `src/ProviderOptimizer.Api/Endpoints/AvailableProvidersEndpoint.cs` for `GET /providers/available`
+- [x] 3.4 Build `src/ProviderOptimizer.Api/Program.cs` as composition root, applying migrations on startup
+- [x] 3.5 Add request and response DTOs in `src/ProviderOptimizer.Api/Contracts/`
+- [x] 3.6 Add `src/ProviderOptimizer.Api/Endpoints/OptimizeEndpoint.cs` for `POST /optimize` returning 200, 400 and 409
+- [x] 3.7 Add `src/ProviderOptimizer.Api/Endpoints/AvailableProvidersEndpoint.cs` for `GET /providers/available`
 
 ## Phase 4: Tests
 
 - [x] 4.1 Unit tests in `tests/ProviderOptimizer.UnitTests/ProviderScoringPolicyTests.cs` covering every provider-scoring scenario
 - [x] 4.2 Unit tests in `tests/ProviderOptimizer.UnitTests/ProviderDiscoveryTests.cs` covering every provider-discovery scenario
-- [ ] 4.3 Add `tests/ProviderOptimizer.IntegrationTests/OptimizerApiFactory.cs` with `WebApplicationFactory` and a Testcontainers Postgres
-- [ ] 4.4 Integration test `tests/ProviderOptimizer.IntegrationTests/OptimizeEndpointTests.cs`: persistence, the 409 path and the 400 path
-- [ ] 4.5 Integration test `tests/ProviderOptimizer.IntegrationTests/AvailableProvidersEndpointTests.cs`: filtering and stable order
-- [ ] 4.6 Integration test proving no case survives a decision-record write failure
+- [x] 4.3 Add `tests/ProviderOptimizer.IntegrationTests/OptimizerApiFactory.cs` with `WebApplicationFactory` and a Testcontainers Postgres
+- [x] 4.4 Integration test `tests/ProviderOptimizer.IntegrationTests/OptimizeEndpointTests.cs`: persistence, the 409 path and the 400 path
+- [x] 4.5 Integration test `tests/ProviderOptimizer.IntegrationTests/AvailableProvidersEndpointTests.cs`: filtering and stable order
+- [x] 4.6 Integration test proving no case survives a decision-record write failure
 
 ## Phase 5: Packaging and CI
 
-- [ ] 5.1 Add `Dockerfile` and `.dockerignore` for the Api
-- [ ] 5.2 Add `docker-compose.yml` with the Api and Postgres
-- [ ] 5.3 Add `.github/workflows/ci.yml` running restore, build and test
+- [x] 5.1 Add `Dockerfile` and `.dockerignore` for the Api
+- [x] 5.2 Add `docker-compose.yml` with the Api and Postgres
+- [x] 5.3 Add `.github/workflows/ci.yml` running restore, build and test
 - [x] 5.4 Extend `.gitignore` for .NET, Node and environment files
-- [ ] 5.5 Document the AWS topology and architecture decisions in `docs/`
+- [x] 5.5 Document the AWS topology and architecture decisions in `docs/`
