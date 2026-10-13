@@ -18,6 +18,10 @@ Chain strategy: stacked-to-main
 400-line budget risk: High
 ```
 
+User decisions recorded 2026-10-13: size:exception ACCEPTED for work unit 1 (632 authored lines);
+commits authorised; chain strategy stacked-to-main; review budget raised so later slices are not
+gated by the 400-line default.
+
 ### Suggested Work Units
 
 | Unit | Goal | Likely PR | Focused test command | Runtime harness | Rollback boundary |
