@@ -47,9 +47,9 @@ gated by the 400-line default.
 
 ## Phase 3: Infrastructure and API
 
-- [ ] 3.1 Map providers, cases and decisions in `src/ProviderOptimizer.Infrastructure/Persistence/OptimizerDbContext.cs`
-- [ ] 3.2 Implement `src/ProviderOptimizer.Infrastructure/Persistence/ProviderRepository.cs` for both repository ports
-- [ ] 3.3 Generate the initial schema migration in `src/ProviderOptimizer.Infrastructure/Migrations/`
+- [x] 3.1 Map providers, cases and decisions in `src/ProviderOptimizer.Infrastructure/Persistence/OptimizerDbContext.cs`
+- [x] 3.2 Implement `src/ProviderOptimizer.Infrastructure/Persistence/ProviderRepository.cs` for both repository ports
+- [x] 3.3 Generate the initial schema migration in `src/ProviderOptimizer.Infrastructure/Migrations/`
 - [ ] 3.4 Build `src/ProviderOptimizer.Api/Program.cs` as composition root, applying migrations on startup
 - [ ] 3.5 Add request and response DTOs in `src/ProviderOptimizer.Api/Contracts/`
 - [ ] 3.6 Add `src/ProviderOptimizer.Api/Endpoints/OptimizeEndpoint.cs` for `POST /optimize` returning 200, 400 and 409
