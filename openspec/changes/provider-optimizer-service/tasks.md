@@ -71,3 +71,14 @@ gated by the 400-line default.
 - [x] 5.3 Add `.github/workflows/ci.yml` running restore, build and test
 - [x] 5.4 Extend `.gitignore` for .NET, Node and environment files
 - [x] 5.5 Document the AWS topology and architecture decisions in `docs/`
+- [x] 5.6 Add the exercise-required `lint` (`dotnet format --verify-no-changes`) and `docker build` steps, `-warnaserror`, and the optional manual ECR push job
+- [x] 5.7 Add the `frontend` CI job (typecheck, lint, build)
+
+## Phase 6: Exercise Deliverables
+
+- [x] 6.1 Write `docs/squad-standards.md`: .NET/React/Docker conventions, branch strategy, code review policy, CI/CD, definition of done, secrets, base architecture, technical debt control
+- [x] 6.2 Reconstruct the defective snippet in `docs/code-review/defective-snippet.cs` with all eight required defects
+- [x] 6.3 Write `docs/code-review/review.md`: every defect located and corrected, plus the extra hardcoded-credential and SQL-injection finding, the refactor and the best practices
+- [x] 6.4 Build the optional React client in `frontend/`: simulated JWT login, provider status table, simulated ETA, score breakdown
+- [x] 6.5 Align the client contract with the real API payloads (`available`, nested `location`, `error`/`detail`)
+- [x] 6.6 Verify: build with `-warnaserror`, `dotnet format` clean, 21 unit + 19 integration tests green, `docker compose up` serving the API, frontend typecheck/lint/build green
