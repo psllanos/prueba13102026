@@ -1,0 +1,31 @@
+# Local Pi runtime state
+.atl/
+
+# .NET build output
+[Bb]in/
+[Oo]bj/
+*.user
+*.suo
+
+# Test and coverage output
+[Tt]est[Rr]esult*/
+coverage*.json
+coverage*.xml
+*.coverage
+
+# Local secrets and environment
+.env
+.env.*
+appsettings.*.local.json
+*.pfx
+
+# Node (reserved for the React client, out of scope for this change)
+node_modules/
+dist/
+
+# IDE and OS
+.vs/
+.idea/
+*.swp
+Thumbs.db
+.DS_Store
