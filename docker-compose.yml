@@ -1,0 +1,39 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: provider_optimizer
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d provider_optimizer"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # The API applies migrations on startup and does not retry, so it must not start before
+    # Postgres accepts connections.
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      ConnectionStrings__OptimizerDb: "Host=postgres;Port=5432;Database=provider_optimizer;Username=postgres;Password=postgres"
+      Scoring__Eta: "0.5"
+      Scoring__Distance: "0.2"
+      Scoring__Availability: "0.1"
+      Scoring__Rating: "0.2"
+      Search__DefaultRadiusKm: "10"
+    ports:
+      - "8080:8080"
+
+volumes:
+  postgres-data:

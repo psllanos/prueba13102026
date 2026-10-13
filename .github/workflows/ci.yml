@@ -1,0 +1,42 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore
+        run: dotnet restore ProviderOptimizer.sln
+
+      - name: Build
+        run: dotnet build ProviderOptimizer.sln --configuration Release --no-restore
+
+      # The integration suite starts its own Postgres through Testcontainers, which the
+      # ubuntu-latest image already provides.
+      - name: Test
+        run: >
+          dotnet test ProviderOptimizer.sln
+          --configuration Release
+          --no-build
+          --logger "trx;LogFileName=results.trx"
+          --results-directory ./artifacts
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: ./artifacts/**/*.trx
+          if-no-files-found: warn

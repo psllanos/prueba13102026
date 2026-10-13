@@ -1,0 +1,18 @@
+**/bin
+**/obj
+**/.vs
+**/.idea
+**/.git
+**/.github
+**/node_modules
+
+# Only the API is published, so the planning artifacts and the test projects never enter the image.
+openspec
+tests
+docs
+
+*.md
+.gitignore
+.gitattributes
+Dockerfile
+docker-compose.yml
