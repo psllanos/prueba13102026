@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <RootNamespace>ProviderOptimizer.Api</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../ProviderOptimizer.Application/ProviderOptimizer.Application.csproj" />
+    <ProjectReference Include="../ProviderOptimizer.Infrastructure/ProviderOptimizer.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>
