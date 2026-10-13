@@ -65,5 +65,5 @@ Chain strategy: stacked-to-main
 - [ ] 5.1 Add `Dockerfile` and `.dockerignore` for the Api
 - [ ] 5.2 Add `docker-compose.yml` with the Api and Postgres
 - [ ] 5.3 Add `.github/workflows/ci.yml` running restore, build and test
-- [ ] 5.4 Extend `.gitignore` for .NET, Node and environment files
+- [x] 5.4 Extend `.gitignore` for .NET, Node and environment files
 - [ ] 5.5 Document the AWS topology and architecture decisions in `docs/`
