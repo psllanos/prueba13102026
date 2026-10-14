@@ -747,3 +747,130 @@ button {
     text-align: left;
   }
 }
+
+/* ---------- Ruta animada ---------- */
+
+.pin-vehiculo {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--acento);
+  border: 3px solid #fff;
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+  box-shadow: 0 0 0 5px rgba(79, 157, 255, 0.22), 0 3px 10px rgba(0, 0, 0, 0.5);
+  line-height: 1;
+}
+
+/* Aviso flotante sobre el mapa: estado del ruteo y resumen del viaje. */
+.mapa-aviso {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 9px;
+  background: var(--superficie-alt);
+  border: 1px solid var(--borde);
+  font-size: 0.82rem;
+  color: var(--texto-suave);
+}
+
+.mapa-aviso-ruta {
+  justify-content: space-between;
+  flex-wrap: wrap;
+  background: linear-gradient(135deg, rgba(79, 157, 255, 0.12), rgba(79, 157, 255, 0.04));
+  border-color: rgba(79, 157, 255, 0.3);
+  color: var(--texto);
+}
+
+.mapa-aviso-ruta strong {
+  color: var(--acento);
+}
+
+.mapa-aviso-nota {
+  font-size: 0.75rem;
+  color: var(--ocupado);
+}
+
+.spinner {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  border: 2px solid var(--borde);
+  border-top-color: var(--acento);
+  animation: girar 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation-duration: 2.5s;
+  }
+}
+
+/* ---------- Estado sin resultados ---------- */
+
+.sin-resultados {
+  display: grid;
+  gap: 0.75rem;
+  justify-items: center;
+  text-align: center;
+  padding: 1.75rem 1.25rem;
+  border: 1px dashed var(--borde);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.015);
+}
+
+.sin-resultados-icono {
+  font-size: 2rem;
+  opacity: 0.7;
+}
+
+.sin-resultados h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.sin-resultados-texto {
+  margin: 0;
+  max-width: 56ch;
+  color: var(--texto-suave);
+  font-size: 0.86rem;
+}
+
+.sin-resultados-acciones {
+  display: grid;
+  gap: 1rem;
+  width: 100%;
+  max-width: 460px;
+  margin-top: 0.35rem;
+}
+
+.accion-grupo {
+  display: grid;
+  gap: 0.5rem;
+  justify-items: center;
+}
+
+.accion-etiqueta {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--texto-suave);
+  font-weight: 600;
+}
+
+.chip-accion {
+  border-color: var(--acento);
+  color: var(--acento);
+  background: var(--acento-suave);
+  font-weight: 600;
+}

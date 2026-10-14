@@ -5,6 +5,8 @@ import 'leaflet/dist/leaflet.css';
 import type { Proveedor, TipoServicio, Ubicacion } from '../../shared/types';
 import { ETIQUETA_SERVICIO, ICONO_SERVICIO } from '../../shared/types';
 import { distanciaKm, formatearEta, formatearKm } from '../../shared/geo';
+import { RutaAnimada } from './RutaAnimada';
+import { useRuta } from './useRuta';
 
 interface MapaProveedoresProps {
   ubicacion: Ubicacion;
@@ -12,6 +14,8 @@ interface MapaProveedoresProps {
   proveedores: readonly Proveedor[];
   proveedorElegidoId?: string | undefined;
   tipoServicio: TipoServicio;
+  /** Cuando hay un proveedor elegido, se dibuja la ruta hacia él. */
+  proveedorRuta: Proveedor | null;
 }
 
 /**
@@ -72,22 +76,33 @@ function EncuadrarResultados({
   proveedores: readonly Proveedor[];
 }) {
   const mapa = useMap();
-  const clave = useMemo(() => proveedores.map((p) => p.id).join(','), [proveedores]);
+
+  // Los puntos se derivan a valores primitivos SERIALIZADOS. Depender del array `proveedores` haría
+  // que el mapa se reencuadre en cada render y pelee con el zoom del usuario; depende de la
+  // identidad del conjunto, que es lo que realmente debe disparar un reencuadre.
+  const puntosSerializados = useMemo(
+    () =>
+      proveedores
+        .map((p) => `${p.latitude},${p.longitude}`)
+        .concat(`${ubicacion.latitude},${ubicacion.longitude}`)
+        .join('|'),
+    [proveedores, ubicacion.latitude, ubicacion.longitude],
+  );
 
   useEffect(() => {
     if (proveedores.length === 0) {
       return;
     }
 
-    const puntos: L.LatLngExpression[] = [
-      [ubicacion.latitude, ubicacion.longitude],
-      ...proveedores.map((p) => [p.latitude, p.longitude] as L.LatLngExpression),
-    ];
+    const puntos: L.LatLngExpression[] = puntosSerializados
+      .split('|')
+      .map((par) => {
+        const [lat, lon] = par.split(',');
+        return [Number(lat), Number(lon)] as L.LatLngExpression;
+      });
 
     mapa.fitBounds(L.latLngBounds(puntos), { padding: [48, 48], maxZoom: 15 });
-    // `clave` representa la identidad del conjunto; ubicacion y mapa son estables o derivados.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [clave, mapa]);
+  }, [puntosSerializados, proveedores.length, mapa]);
 
   return null;
 }
@@ -98,8 +113,17 @@ export function MapaProveedores({
   proveedores,
   proveedorElegidoId,
   tipoServicio,
+  proveedorRuta,
 }: MapaProveedoresProps) {
   const centro: L.LatLngExpression = [ubicacion.latitude, ubicacion.longitude];
+
+  const destino = proveedorRuta === null
+    ? null
+    : { latitude: proveedorRuta.latitude, longitude: proveedorRuta.longitude };
+
+  // Ruta por calles hacia el proveedor elegido. `useRuta` aborta la petición anterior si el
+  // destino cambia, así que una respuesta lenta no puede sobrescribir a una más reciente.
+  const { ruta, cargando: cargandoRuta } = useRuta(ubicacion, destino);
 
   return (
     <div className="mapa-contenedor">
@@ -140,6 +164,11 @@ export function MapaProveedores({
           </Popup>
         </Marker>
 
+        {/* Ruta animada hacia el proveedor elegido, estilo app de transporte. */}
+        {ruta !== null && proveedorRuta !== null && (
+          <RutaAnimada ruta={ruta} proveedor={proveedorRuta} tipoServicio={tipoServicio} />
+        )}
+
         {proveedores.map((proveedor) => {
           const elegido = proveedor.id === proveedorElegidoId;
           const km = distanciaKm(ubicacion, {
@@ -170,6 +199,27 @@ export function MapaProveedores({
           );
         })}
       </MapContainer>
+
+      {cargandoRuta && (
+        <div className="mapa-aviso" role="status">
+          <span className="spinner" aria-hidden="true" />
+          Trazando la ruta hasta el proveedor…
+        </div>
+      )}
+
+      {ruta !== null && !cargandoRuta && (
+        <div className="mapa-aviso mapa-aviso-ruta">
+          <span>
+            <strong>{formatearKm(ruta.distanciaKm)}</strong> ·{' '}
+            {formatearEta(ruta.duracionMin)} de llegada
+          </span>
+          {ruta.esAproximada && (
+            <span className="mapa-aviso-nota">
+              Ruteo no disponible: se muestra la distancia en línea recta.
+            </span>
+          )}
+        </div>
+      )}
 
       <div className="mapa-leyenda">
         <span className="leyenda-item">
