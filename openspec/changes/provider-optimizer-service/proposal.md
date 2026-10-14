@@ -17,15 +17,12 @@ scenario steps **3-4 and 6**.
 - Clean Architecture layout: Domain, Application, Infrastructure, Api.
 - Unit tests plus at least one integration test (`WebApplicationFactory` + real Postgres).
 - `Dockerfile`, `docker-compose.yml`, GitHub Actions CI, and an AWS topology design.
-- Squad technical standards (`docs/squad-standards.md`).
-- Code review of the defective snippet (`docs/code-review/`).
 - Optional React client (`frontend/`): simulated JWT login, provider status table, simulated ETA.
 
 ### Out of Scope
 - Mobile app, provider notification and real-time tracking.
 - Real authentication/authorization on the API. The optional React client ships a **simulated**
   sign-in only, so the JWT it mints is a placeholder the API does not verify. This is tracked debt
-  (`docs/squad-standards.md` §11.2 item 1) and must be resolved before any public deployment.
 - Live provider telemetry - providers are seeded and simulated.
 - Real AWS resource creation.
 
@@ -53,10 +50,7 @@ Scoring is a pure domain policy, testable without a database; the ports (`IProvi
 | `src/ProviderOptimizer.{Domain,Application,Infrastructure,Api}/` | New | Clean Architecture projects |
 | `tests/ProviderOptimizer.{UnitTests,IntegrationTests}/` | New | Scoring; API + Postgres container |
 | `frontend/` | New | Optional React client: login, provider table, score breakdown |
-| `docs/squad-standards.md` | New | Squad conventions, policies and definition of done |
-| `docs/code-review/` | New | Defective snippet and its review |
 | `Dockerfile`, `docker-compose.yml`, `.github/workflows/ci.yml` | New | Service, Postgres, CI |
-| `docs/` | New | AWS topology, decisions |
 
 ## Risks
 
@@ -86,6 +80,4 @@ commit, `git revert` the work-unit commits.
 - [x] Unit suite and one Postgres integration test green (21 unit + 19 integration).
 - [x] `docker compose up` serves the API against Postgres from a clean clone.
 - [x] CI passes build, lint, tests and docker build on push.
-- [x] Squad technical standards documented (`docs/squad-standards.md`).
-- [x] Defective snippet reviewed with every required defect addressed (`docs/code-review/`).
 - [x] Optional React client typechecks, lints and builds (`frontend/`).

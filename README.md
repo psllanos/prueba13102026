@@ -1,69 +1,48 @@
-# ProviderOptimizerService — ASISYA Technical Exercise
+# Optimizador de Proveedores — Prueba Técnica ASISYA
 
-Solution for the **Líder Técnico de Desarrollo** exercise: the *Asignación Inteligente de
-Proveedores* module of an assistance system (tow truck, locksmith, battery).
+Solución del módulo **Asignación Inteligente de Proveedores** para un sistema de asistencias
+vehiculares (grúa, cerrajería, batería).
 
-When a customer requests assistance, the service decides **which provider should serve it, and
-why**, then records the case.
-
----
-
-## Deliverables
-
-The exercise asks for four mandatory deliverables plus CI and an optional client. Map:
-
-| # | Deliverable | Where | Status |
-|---|---|---|---|
-| 1 | Diseño arquitectónico completo | [`docs/architecture.md`](docs/architecture.md), [`docs/aws-deployment.md`](docs/aws-deployment.md) | Done |
-| 2 | Microservicio crítico implementado (.NET) | [`src/`](src/) | Done |
-| 3 | Estándares técnicos del squad | [`docs/squad-standards.md`](docs/squad-standards.md) | Done |
-| 4 | Code review de código defectuoso | [`docs/code-review/review.md`](docs/code-review/review.md) | Done |
-| 5 | CI/CD (GitHub Actions) | [`.github/workflows/ci.yml`](.github/workflows/ci.yml) | Done |
-| 6 | Frontend React (opcional) | [`frontend/`](frontend/) | Done |
-
-> **Note on deliverable 4.** The exercise PDF announces *"Se entrega este snippet defectuoso"* and
-> ends the section on **"Snippet (C#):"** without including the code — the snippet is not in the
-> PDF's content streams, images or embedded files. The snippet was reconstructed to contain
-> **exactly the eight defects the exercise enumerates**, and every one is traced to a line. See
-> [`docs/code-review/review.md`](docs/code-review/review.md).
+Cuando un cliente pide asistencia, el sistema decide **qué proveedor debe atenderlo, y por qué**, y
+después registra el caso.
 
 ---
 
-## What it does
+## Qué hace
 
 ```
-POST /optimize                → select the optimal provider, persist the case + its decision
-GET  /providers/available     → list providers eligible for a service type and location
+POST /optimize                → elige el proveedor óptimo, guarda el caso y su decisión
+GET  /providers/available     → lista los proveedores habilitados para un servicio y una ubicación
 ```
 
-Scoring is deterministic over **ETA, distance, availability and rating**. Each factor is normalised
-across the candidate set and weighted, and the response carries the full **score breakdown** so the
-decision is auditable rather than a bare number. Ties break by provider id.
+La selección es **determinista** sobre ETA, distancia, disponibilidad y rating. Cada factor se
+normaliza entre los candidatos y se pondera, y la respuesta incluye el **desglose completo del
+puntaje** para que la decisión sea auditable y no un número suelto. Los empates se resuelven por id.
 
-Covers steps **3, 4 and 6** of the exercise's flow (search providers, compute the optimum, record
-the case). Request intake, provider notification and real-time tracking are other services' concern.
+Cubre los pasos **3, 4 y 6** del flujo del enunciado: buscar proveedores, calcular el óptimo y
+registrar el caso.
 
 ---
 
-## Run it
+## Cómo levantarlo
 
-### Requirements
+### Requisitos
 
-.NET 8 SDK · Docker Desktop · (optional) Node 22+ for the client.
+.NET 8 SDK · Docker Desktop · (opcional) Node 22+ para el frontend.
 
-### Full stack
+### Stack completo
 
 ```bash
 docker compose up --build
 ```
 
-Brings up Postgres (with a healthcheck) and the API, applying migrations on startup. The API waits
-for Postgres to accept connections — it applies migrations at boot and does not retry.
+Levanta Postgres (con healthcheck) y la API, aplicando las migraciones al arrancar. La API espera a
+que Postgres acepte conexiones: aplica migraciones al inicio y no reintenta.
 
 ```bash
-# Seed providers so the endpoints have something to return.
-# This form works in every shell, including cmd.exe: it copies the file INTO the container and
-# runs it with psql's own -f flag, so it uses no redirection, no `$(...)` and no heredoc.
+# Cargar proveedores de ejemplo. Esta forma funciona en TODAS las shells, incluido cmd.exe:
+# copia el archivo DENTRO del contenedor y lo ejecuta con el flag -f de psql, así que no usa
+# redirección, ni $(...), ni heredoc.
 docker compose cp scripts/seed.sql postgres:/tmp/seed.sql
 docker compose exec -T postgres psql -U postgres -d provider_optimizer -f /tmp/seed.sql
 
@@ -75,37 +54,37 @@ curl -s -X POST http://localhost:8080/optimize \
 ```
 
 <details>
-<summary><strong>Windows: which shell constructs work, and which silently fail</strong></summary>
+<summary><strong>Windows: qué constructos funcionan y cuáles fallan en silencio</strong></summary>
 
-The `cmd.exe` pitfall is nastier than a syntax error. This command LOOKS like it works but does
-nothing:
+El problema con `cmd.exe` es más peligroso que un error de sintaxis. Este comando **parece**
+funcionar pero no hace nada:
 
 ```cmd
 docker compose exec -T postgres psql -U postgres -d provider_optimizer < scripts/seed.sql
 ```
 
-`<` is not an input redirect in `cmd.exe`. cmd passes `"<"` and `"scripts/seed.sql"` to `psql` as
-literal arguments, so `psql` prints:
+`<` **no** es una redirección de entrada en `cmd.exe`. cmd le pasa `"<"` y `"scripts/seed.sql"` a
+`psql` como argumentos literales, y `psql` responde:
 
 ```
 psql: warning: extra command-line argument "<" ignored
 psql: warning: extra command-line argument "scripts/seed.sql" ignored
 ```
 
-...and then exits **successfully without seeding anything**. There is no error code to catch; the
-next API call just returns an empty list.
+...y sale **con éxito sin cargar nada**. No hay código de error que detectar; la siguiente llamada a
+la API simplemente devuelve una lista vacía.
 
-| Construct | `cmd.exe` | PowerShell | bash / Git Bash | Linux |
+| Constructo | `cmd.exe` | PowerShell | bash / Git Bash | Linux |
 |---|---|---|---|---|
-| `< file` input redirect | ❌ silently ignored | ❌ | ✅ | ✅ |
-| `<<'SQL'` heredoc | ❌ syntax error | ❌ | ✅ | ✅ |
-| `$(...)` substitution | ❌ | ✅ | ✅ | ✅ |
-| `psql -f file` inside the container | ✅ | ✅ | ✅ | ✅ |
+| Redirección `< file` | ❌ ignorada en silencio | ❌ | ✅ | ✅ |
+| Heredoc `<<'SQL'` | ❌ error de sintaxis | ❌ | ✅ | ✅ |
+| Sustitución `$(...)` | ❌ | ✅ | ✅ | ✅ |
+| `psql -f` dentro del contenedor | ✅ | ✅ | ✅ | ✅ |
 
-The `docker compose cp` + `-f` form documented above is the only one that works everywhere, which
-is why it is the primary instruction.
+La forma con `docker compose cp` + `-f` es la única que funciona en todos lados, y por eso es la
+instrucción principal.
 
-**If you are in bash or Git Bash**, the shorter equivalent is fine:
+**Si estás en bash o Git Bash**, el equivalente corto también sirve:
 
 ```bash
 docker compose exec -T postgres psql -U postgres -d provider_optimizer < scripts/seed.sql
@@ -113,113 +92,99 @@ docker compose exec -T postgres psql -U postgres -d provider_optimizer < scripts
 
 </details>
 
-### Without Docker
+### Sin Docker
 
 ```bash
 dotnet build ProviderOptimizer.sln -c Release
 dotnet run --project src/ProviderOptimizer.Api
 ```
 
-Requires `ConnectionStrings__OptimizerDb`; the app **fails fast** if it is absent rather than
-falling back to an insecure default.
+Requiere `ConnectionStrings__OptimizerDb`. La aplicación **falla al arrancar** si no está, en lugar
+de caer en un valor por defecto inseguro.
 
-### Frontend (optional)
+### Frontend
 
 ```bash
 cd frontend
 npm install
-npm run dev     # http://localhost:5173, proxies /api to the API on :8080
+npm run dev     # http://localhost:5173, hace proxy de /api hacia la API en :8080
 ```
 
-Simulated JWT sign-in (any non-empty credentials), provider status table with simulated ETA, and the
-score breakdown for the selected provider.
+Login con JWT simulado (cualquier usuario y contraseña no vacíos), mapa con la ubicación del usuario
+y el radio de búsqueda, tabla de proveedores con ETA, y el desglose del puntaje del proveedor
+elegido.
 
 ---
 
-## Verify
+## Verificación
 
-Every claim below was executed; nothing is asserted from intent.
+Todo lo de abajo se ejecutó. Nada está afirmado desde la intención.
 
-| Check | Command | Result |
+| Verificación | Comando | Resultado |
 |---|---|---|
-| Build (warnings are errors) | `dotnet build ProviderOptimizer.sln -c Release -warnaserror` | 0 warnings, 0 errors |
-| Lint | `dotnet format ProviderOptimizer.sln --verify-no-changes` | clean |
-| Unit tests | `dotnet test tests/ProviderOptimizer.UnitTests` | **21 passed** |
-| Integration tests (real Postgres) | `dotnet test tests/ProviderOptimizer.IntegrationTests` | **19 passed** |
-| Frontend typecheck | `npm run typecheck` | clean |
-| Frontend lint | `npm run lint` | clean |
-| Frontend build | `npm run build` | built |
-| End-to-end | `docker compose up` + real `POST /optimize` | 200, case persisted |
+| Build (los warnings son errores) | `dotnet build ProviderOptimizer.sln -c Release -warnaserror` | 0 warnings, 0 errores |
+| Formato | `dotnet format ProviderOptimizer.sln --verify-no-changes` | limpio |
+| Tests unitarios | `dotnet test tests/ProviderOptimizer.UnitTests` | **21 en verde** |
+| Tests de integración (Postgres real) | `dotnet test tests/ProviderOptimizer.IntegrationTests` | **19 en verde** |
+| Frontend: tipos | `npm run typecheck` | limpio |
+| Frontend: lint | `npm run lint` | limpio |
+| Frontend: build | `npm run build` | compila |
+| End-to-end | `docker compose up` + `POST /optimize` real | 200, caso persistido |
 
-The integration suite hosts the real application (`WebApplicationFactory`) against a **real Postgres
-container** (Testcontainers) — it does not mock the database.
+La suite de integración levanta la aplicación real (`WebApplicationFactory`) contra un **Postgres
+real** (Testcontainers). No mockea la base: un test unitario con la base mockeada no prueba que el
+SQL esté bien.
 
 ---
 
-## Architecture
+## Arquitectura
 
 ```
-ProviderOptimizer.Api          minimal API, DTOs, composition root, migrations on startup
+ProviderOptimizer.Api              minimal API, DTOs, composition root, migraciones al arrancar
         │
-ProviderOptimizer.Infrastructure   EF Core, Npgsql, repositories  (implements the ports)
+ProviderOptimizer.Infrastructure   EF Core, Npgsql, repositorios (implementan los puertos)
         │
-ProviderOptimizer.Application      use cases and ports
+ProviderOptimizer.Application      casos de uso y puertos
         │
-ProviderOptimizer.Domain           entities, value objects, scoring and eligibility rules
+ProviderOptimizer.Domain           entidades, value objects, reglas de scoring y elegibilidad
 ```
 
-**The dependency rule points inward.** `Domain` references nothing; the rule is enforced by project
-references, so a violation fails the build instead of relying on a reviewer's memory.
+**La regla de dependencia apunta hacia adentro.** `Domain` no referencia nada; la regla la impone el
+compilador vía referencias de proyecto, así que una violación rompe el build en lugar de depender de
+que un reviewer se acuerde.
 
-Three decisions carry the design:
+Tres decisiones sostienen el diseño:
 
-| Decision | Why |
+| Decisión | Por qué |
 |---|---|
-| Eligibility and scoring are **pure domain code**, not SQL | Every rule is provable with unit tests, with no database and no clock |
-| The repository is a **coarse pre-filter only** | SQL filtering cannot be unit-tested; a contract test proves the pre-filter agrees with the domain rule |
-| A case **cannot be represented without its decision** (`breakdown jsonb NOT NULL`) | The guarantee is structural, not a runtime check someone must remember |
-
-Full detail: [`docs/architecture.md`](docs/architecture.md) · AWS topology:
-[`docs/aws-deployment.md`](docs/aws-deployment.md) · conventions:
-[`docs/squad-standards.md`](docs/squad-standards.md).
+| Elegibilidad y scoring son **código de dominio puro**, no SQL | Cada regla se prueba con tests unitarios, sin base de datos y sin reloj |
+| El repositorio es un **pre-filtro grueso**, no la autoridad | El filtrado SQL no se puede testear; un test de contrato prueba que el pre-filtro coincide con la regla de dominio |
+| Un caso **no se puede representar sin su decisión** (`breakdown jsonb NOT NULL`) | La garantía es estructural, no una verificación que alguien tiene que recordar |
 
 ---
 
-## Layout
+## Estructura
 
 ```
-src/            Clean Architecture projects (Domain, Application, Infrastructure, Api)
-tests/          Unit and integration suites
-frontend/       Optional React client (TypeScript, Vite)
-scripts/        Development seed data
-docs/           Architecture, AWS topology, squad standards
-docs/code-review/   Defective snippet and its review
-openspec/       Spec-driven change: proposal, design, specs, tasks
-.github/        CI pipeline
+src/            Proyectos de Clean Architecture (Domain, Application, Infrastructure, Api)
+tests/          Suite unitaria y de integración
+frontend/       Cliente React (TypeScript, Vite) con mapa y tabla de proveedores
+scripts/        Datos de ejemplo para desarrollo
+openspec/       Cambio guiado por especificación: proposal, design, specs, tasks
+.github/        Pipeline de CI
 ```
 
 ---
 
-## Known limitations
+## Limitaciones conocidas
 
-Stated openly rather than left for the reviewer to discover. Each is tracked in
-[`docs/squad-standards.md`](docs/squad-standards.md) §11.2.
+Declaradas de frente, en lugar de dejar que las descubras.
 
-- **The API has no authentication or authorization.** It must not be exposed publicly until it does.
-  The frontend's JWT is a *simulated* placeholder that the API does not verify.
-- **No rate limiting** on `POST /optimize`, which runs an outbound query per call.
-- **Providers are seeded and simulated** — ETA and distance are not real telemetry.
-- **Scoring runs in-process on a single instance**; no distributed cache yet (Redis is in the target
-  architecture but not wired).
-- **No structured logging, metrics or tracing** yet.
-- `dotnet format` is in CI, but the analyzers that enforce the async rules (`VSTHRD002`, `CA2007`)
-  are not enabled yet.
-
----
-
-## Exercise
-
-The original brief (recruitment material, not published with this repository) asked for four
-mandatory deliverables — architecture, one implemented microservice, squad standards and a code
-review — plus a GitHub Actions pipeline and an optional React client. How each one was addressed is
-mapped in the **Deliverables** table at the top of this document.
+- **La API no tiene autenticación ni autorización.** No debe exponerse públicamente hasta que la
+  tenga. El JWT del frontend es un placeholder simulado que la API no verifica.
+- **Sin rate limiting** en `POST /optimize`, que hace una consulta saliente por llamada.
+- **Los proveedores son simulados** — el ETA y la distancia no son telemetría real.
+- **El scoring corre en proceso sobre una sola instancia**; todavía no hay caché distribuida.
+- **Sin logging estructurado, métricas ni trazas.**
+- `dotnet format` corre en CI, pero los analizadores que fuerzan las reglas de async
+  (`VSTHRD002`, `CA2007`) todavía no están habilitados.
