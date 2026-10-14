@@ -1,25 +1,26 @@
 /**
- * Token storage.
+ * Almacenamiento del token.
  *
- * The squad standard forbids putting the JWT in `localStorage` (docs/squad-standards.md §3.2):
- * any XSS reads it, and it survives until explicitly cleared. This demo keeps the token in memory
- * only, which is the safe default.
+ * Guardar el JWT en `localStorage` está prohibido por política del squad: cualquier XSS lo lee y
+ * sobrevive hasta que se borre explícitamente. Esta demo lo mantiene sólo en memoria, que es el
+ * valor por defecto seguro.
  *
- * TRADE-OFF, stated honestly: an in-memory token is lost on reload. A production system pairs this
- * with an httpOnly refresh cookie, so the access token stays short-lived and in memory while the
- * refresh token is unreachable from JavaScript. That refresh flow is out of scope for this demo.
+ * CONTRAPARTIDA, dicha de frente: un token en memoria se pierde al recargar la página. Un sistema en
+ * producción combina esto con una cookie httpOnly de refresco, para que el token de acceso sea de
+ * vida corta y viva en memoria mientras el de refresco queda inalcanzable desde JavaScript. Ese
+ * flujo de refresco está fuera del alcance de esta demo.
  */
 
-let accessToken: string | null = null;
+let tokenAcceso: string | null = null;
 
-export function getAccessToken(): string | null {
-  return accessToken;
+export function obtenerToken(): string | null {
+  return tokenAcceso;
 }
 
-export function setAccessToken(token: string): void {
-  accessToken = token;
+export function guardarToken(token: string): void {
+  tokenAcceso = token;
 }
 
-export function clearAccessToken(): void {
-  accessToken = null;
+export function borrarToken(): void {
+  tokenAcceso = null;
 }

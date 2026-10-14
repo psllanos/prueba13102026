@@ -1,30 +1,38 @@
 /**
- * Domain types mirrored from the REAL API contract
+ * Tipos de dominio espejados del contrato REAL de la API
  * (src/ProviderOptimizer.Api/Contracts/Payloads.cs).
  *
- * These are DTOs, deliberately separate from any UI state. The API never leaks its persistence
- * entities, so the client must not invent fields the contract does not promise either.
+ * Son DTOs, deliberadamente separados del estado de la UI. La API nunca expone sus entidades de
+ * persistencia, así que el cliente tampoco debe inventar campos que el contrato no promete.
  *
- * Field names match the serialized JSON exactly (camelCase over the C# record properties).
+ * Los nombres coinciden exactamente con el JSON serializado (camelCase sobre las propiedades del
+ * record de C#).
  */
 
-export type ServiceType = 'tow-truck' | 'locksmith' | 'battery';
+export type TipoServicio = 'tow-truck' | 'locksmith' | 'battery';
 
-export const SERVICE_TYPES: readonly ServiceType[] = ['tow-truck', 'locksmith', 'battery'] as const;
+export const TIPOS_SERVICIO: readonly TipoServicio[] = ['tow-truck', 'locksmith', 'battery'] as const;
 
-export const SERVICE_TYPE_LABELS: Record<ServiceType, string> = {
-  'tow-truck': 'Tow truck',
-  locksmith: 'Locksmith',
-  battery: 'Battery',
+export const ETIQUETA_SERVICIO: Record<TipoServicio, string> = {
+  'tow-truck': 'Grúa',
+  locksmith: 'Cerrajería',
+  battery: 'Batería',
 };
 
-export interface GeoLocation {
+/** Ícono por tipo de servicio, para reconocerlo en el mapa de un vistazo. */
+export const ICONO_SERVICIO: Record<TipoServicio, string> = {
+  'tow-truck': '🚚',
+  locksmith: '🔑',
+  battery: '🔋',
+};
+
+export interface Ubicacion {
   latitude: number;
   longitude: number;
 }
 
-/** Mirrors `ProviderPayload`. Note `available`, not `isAvailable`. */
-export interface Provider {
+/** Espeja `ProviderPayload`. Nota: `available`, no `isAvailable`. */
+export interface Proveedor {
   id: string;
   name: string;
   serviceType: string;
@@ -35,26 +43,42 @@ export interface Provider {
   available: boolean;
 }
 
-/** Mirrors `ScoreFactorPayload` — one factor of the score, so the UI can explain why a provider won. */
-export interface ScoreFactor {
+/** Espeja `ScoreFactorPayload` — un factor del puntaje, para poder explicar por qué ganó. */
+export interface FactorPuntaje {
   factor: string;
   raw: number;
   weight: number;
   contribution: number;
 }
 
-/** Mirrors `OptimizePayload`. */
-export interface OptimizeResult {
+/** Espeja `OptimizePayload`. */
+export interface ResultadoOptimizacion {
   caseId: string;
-  selectedProvider: Provider;
+  selectedProvider: Proveedor;
   totalScore: number;
-  breakdown: readonly ScoreFactor[];
+  breakdown: readonly FactorPuntaje[];
   decidedAt: string;
 }
 
-/** Mirrors `OptimizeRequest`. The location is a nested object, not flat coordinates. */
-export interface OptimizeRequestBody {
-  serviceType: ServiceType;
-  location: GeoLocation;
+/** Espeja `OptimizeRequest`. La ubicación es un objeto anidado, no coordenadas planas. */
+export interface CuerpoOptimizacion {
+  serviceType: TipoServicio;
+  location: Ubicacion;
   searchRadiusKm?: number;
 }
+
+/** Nombre legible de cada factor del puntaje, para la tabla. */
+export const ETIQUETA_FACTOR: Record<string, string> = {
+  eta: 'ETA',
+  distance: 'Distancia',
+  availability: 'Disponibilidad',
+  rating: 'Calificación',
+};
+
+/** Unidades de cada factor, para que el número crudo signifique algo. */
+export const UNIDAD_FACTOR: Record<string, string> = {
+  eta: 'min',
+  distance: 'km',
+  availability: '',
+  rating: '★',
+};

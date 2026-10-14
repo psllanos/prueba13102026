@@ -6,7 +6,7 @@ export default defineConfig({
   server: {
     port: 5173,
     // Proxied so the browser talks to one origin in development and there is no CORS hole.
-    // In production the CDN/API Gateway owns this routing (see docs/aws-deployment.md).
+    // In production the CDN/API Gateway owns this routing.
     proxy: {
       // The client calls `/api/...`; the API itself serves `/providers/available` and `/optimize`
       // with NO prefix, so the rewrite strips it. Without this the API returns 404.

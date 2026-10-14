@@ -1,31 +1,41 @@
-import { clearAccessToken, getAccessToken } from './tokenStore';
+import { borrarToken, obtenerToken } from './tokenStore';
 
-/** Error shape the API returns: `{ error, detail }` (ProblemPayload). */
-export interface ProblemPayload {
+/** Forma del error que devuelve la API: `{ error, detail }` (ProblemPayload). */
+export interface CargaProblema {
   error: string;
   detail: string;
 }
 
-export class ApiError extends Error {
-  readonly status: number;
-  readonly code: string;
+/** Traduce los códigos de error de la API a mensajes en español para el usuario. */
+const MENSAJES_ERROR: Record<string, string> = {
+  invalid_request: 'Los datos enviados no son válidos.',
+  no_provider_available: 'No hay ningún proveedor disponible para ese servicio en esa zona.',
+  unauthorized: 'Tu sesión expiró. Volvé a iniciar sesión.',
+  unknown_error: 'Ocurrió un error inesperado.',
+};
 
-  constructor(status: number, payload: ProblemPayload) {
-    super(payload.detail);
-    this.name = 'ApiError';
+export class ErrorApi extends Error {
+  readonly status: number;
+  readonly codigo: string;
+
+  constructor(status: number, carga: CargaProblema) {
+    // El detalle de la API es más específico cuando existe; si no, cae al mensaje por código.
+    super(carga.detail || MENSAJES_ERROR[carga.error] || MENSAJES_ERROR.unknown_error!);
+    this.name = 'ErrorApi';
     this.status = status;
-    this.code = payload.error;
+    this.codigo = carga.error;
   }
 }
 
 /**
- * Single place that knows how to talk to the API: base path, auth header, error contract.
- * Components never call `fetch` directly — otherwise every component grows its own error handling.
+ * Único lugar que sabe hablar con la API: ruta base, cabecera de auth y contrato de error.
+ * Los componentes nunca llaman a `fetch` directamente: si no, cada componente inventa su propio
+ * manejo de errores y las traducciones se dispersan.
  */
 export async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
-  const token = getAccessToken();
+  const token = obtenerToken();
 
-  const response = await fetch(`/api${path}`, {
+  const respuesta = await fetch(`/api${path}`, {
     ...init,
     headers: {
       'Content-Type': 'application/json',
@@ -34,33 +44,36 @@ export async function apiFetch<T>(path: string, init: RequestInit = {}): Promise
     },
   });
 
-  if (response.status === 401) {
-    // The session is gone: drop the token so the app falls back to the login screen.
-    clearAccessToken();
-    throw new ApiError(401, { error: 'unauthorized', detail: 'Your session expired. Sign in again.' });
+  if (respuesta.status === 401) {
+    // La sesión se perdió: se descarta el token para que la app vuelva al login.
+    borrarToken();
+    throw new ErrorApi(401, {
+      error: 'unauthorized',
+      detail: MENSAJES_ERROR.unauthorized!,
+    });
   }
 
-  if (!response.ok) {
-    const payload = await safeProblem(response);
-    throw new ApiError(response.status, payload);
+  if (!respuesta.ok) {
+    const carga = await problemaSeguro(respuesta);
+    throw new ErrorApi(respuesta.status, carga);
   }
 
-  if (response.status === 204) {
+  if (respuesta.status === 204) {
     return undefined as T;
   }
 
-  return (await response.json()) as T;
+  return (await respuesta.json()) as T;
 }
 
-async function safeProblem(response: Response): Promise<ProblemPayload> {
+async function problemaSeguro(respuesta: Response): Promise<CargaProblema> {
   try {
-    const body = (await response.json()) as Partial<ProblemPayload>;
+    const cuerpo = (await respuesta.json()) as Partial<CargaProblema>;
     return {
-      error: body.error ?? 'unknown_error',
-      detail: body.detail ?? `Request failed with status ${response.status}.`,
+      error: cuerpo.error ?? 'unknown_error',
+      detail: cuerpo.detail ?? `La petición falló con estado ${respuesta.status}.`,
     };
   } catch {
-    // A non-JSON error body must not crash the UI with a parse exception.
-    return { error: 'unknown_error', detail: `Request failed with status ${response.status}.` };
+    // Un cuerpo de error que no es JSON no debe romper la UI con una excepción de parseo.
+    return { error: 'unknown_error', detail: `La petición falló con estado ${respuesta.status}.` };
   }
 }

@@ -2,38 +2,38 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { AuthProvider } from './features/auth/AuthContext';
+import { ProveedorAuth } from './features/auth/AuthContext';
 import { App } from './App';
 import './styles.css';
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      // Do not retry a client error: a 400/409 will not succeed on the second attempt.
-      retry: (failureCount, error) => {
+      // No se reintenta un error de cliente: un 400/409 no va a funcionar al segundo intento.
+      retry: (intentos, error) => {
         const status = (error as { status?: number }).status;
         if (typeof status === 'number' && status >= 400 && status < 500) {
           return false;
         }
-        return failureCount < 2;
+        return intentos < 2;
       },
       refetchOnWindowFocus: false,
     },
   },
 });
 
-const rootElement = document.getElementById('root');
-if (rootElement === null) {
-  throw new Error('Root element #root is missing from index.html.');
+const elementoRaiz = document.getElementById('root');
+if (elementoRaiz === null) {
+  throw new Error('Falta el elemento raíz #root en index.html.');
 }
 
-createRoot(rootElement).render(
+createRoot(elementoRaiz).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <AuthProvider>
+        <ProveedorAuth>
           <App />
-        </AuthProvider>
+        </ProveedorAuth>
       </BrowserRouter>
     </QueryClientProvider>
   </StrictMode>,

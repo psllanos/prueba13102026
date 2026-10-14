@@ -1,33 +1,36 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { useAuth } from './features/auth/AuthContext';
-import { LoginPage } from './features/auth/LoginPage';
-import { ProvidersPage } from './features/providers/ProvidersPage';
+import { PaginaLogin } from './features/auth/PaginaLogin';
+import { PaginaProveedores } from './features/providers/PaginaProveedores';
 import type { ReactElement } from 'react';
 
-/** Redirects to the login screen when there is no session. */
-function RequireAuth({ children }: { children: ReactElement }) {
-  const { isAuthenticated } = useAuth();
-  return isAuthenticated ? children : <Navigate to="/login" replace />;
+/** Redirige al login cuando no hay sesión. */
+function RequiereAuth({ children }: { children: ReactElement }) {
+  const { autenticado } = useAuth();
+  return autenticado ? children : <Navigate to="/login" replace />;
 }
 
 export function App() {
-  const { isAuthenticated } = useAuth();
+  const { autenticado } = useAuth();
 
   return (
     <Routes>
       <Route
         path="/login"
-        element={isAuthenticated ? <Navigate to="/providers" replace /> : <LoginPage />}
+        element={autenticado ? <Navigate to="/proveedores" replace /> : <PaginaLogin />}
       />
       <Route
-        path="/providers"
+        path="/proveedores"
         element={
-          <RequireAuth>
-            <ProvidersPage />
-          </RequireAuth>
+          <RequiereAuth>
+            <PaginaProveedores />
+          </RequiereAuth>
         }
       />
-      <Route path="*" element={<Navigate to={isAuthenticated ? '/providers' : '/login'} replace />} />
+      <Route
+        path="*"
+        element={<Navigate to={autenticado ? '/proveedores' : '/login'} replace />}
+      />
     </Routes>
   );
 }

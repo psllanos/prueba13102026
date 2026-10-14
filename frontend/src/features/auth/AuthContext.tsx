@@ -6,59 +6,60 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import { clearAccessToken, getAccessToken, setAccessToken } from '../../shared/tokenStore';
+import { borrarToken, guardarToken, obtenerToken } from '../../shared/tokenStore';
 
-interface AuthContextValue {
-  isAuthenticated: boolean;
-  signIn: (username: string, password: string) => Promise<void>;
-  signOut: () => void;
+interface ValorContextoAuth {
+  autenticado: boolean;
+  iniciarSesion: (usuario: string, contrasena: string) => Promise<void>;
+  cerrarSesion: () => void;
 }
 
-const AuthContext = createContext<AuthContextValue | null>(null);
+const ContextoAuth = createContext<ValorContextoAuth | null>(null);
 
 /**
- * Authentication for the demo.
+ * Autenticación para la demo.
  *
- * There is no identity provider in scope for this exercise, so the credential check is simulated
- * locally and the token is a locally minted placeholder. The POINT of this file is the shape:
- * the token is held in memory, the session is explicit, and components never touch storage
- * directly. Swapping this for a real OIDC/JWT endpoint means rewriting `signIn` and nothing else.
+ * No hay proveedor de identidad en el alcance de este ejercicio, así que la validación de
+ * credenciales es simulada localmente y el token es un placeholder generado en el cliente. Lo
+ * importante de este archivo es la FORMA: el token vive en memoria, la sesión es explícita y los
+ * componentes nunca tocan el almacenamiento directamente. Cambiar esto por un endpoint real de
+ * OIDC/JWT implica reescribir `iniciarSesion` y nada más.
  *
- * The simulated token must never be trusted by the API — the API has no auth yet, which is
- * tracked debt (docs/squad-standards.md §11.2 item 1).
+ * El token simulado NUNCA debe ser confiado por la API: la API todavía no tiene autenticación, lo
+ * cual está declarado como deuda en el README.
  */
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(() => getAccessToken() !== null);
+export function ProveedorAuth({ children }: { children: ReactNode }) {
+  const [autenticado, setAutenticado] = useState(() => obtenerToken() !== null);
 
-  const signIn = useCallback(async (username: string, password: string) => {
-    if (username.trim() === '' || password.trim() === '') {
-      throw new Error('Username and password are required.');
+  const iniciarSesion = useCallback(async (usuario: string, contrasena: string) => {
+    if (usuario.trim() === '' || contrasena.trim() === '') {
+      throw new Error('El usuario y la contraseña son obligatorios.');
     }
 
-    // Simulated token exchange. Replace with a POST to the identity endpoint.
+    // Intercambio de token simulado. Reemplazar por un POST al endpoint de identidad.
     await Promise.resolve();
 
-    setAccessToken(`demo.${btoa(username)}.token`);
-    setIsAuthenticated(true);
+    guardarToken(`demo.${btoa(usuario)}.token`);
+    setAutenticado(true);
   }, []);
 
-  const signOut = useCallback(() => {
-    clearAccessToken();
-    setIsAuthenticated(false);
+  const cerrarSesion = useCallback(() => {
+    borrarToken();
+    setAutenticado(false);
   }, []);
 
-  const value = useMemo<AuthContextValue>(
-    () => ({ isAuthenticated, signIn, signOut }),
-    [isAuthenticated, signIn, signOut],
+  const valor = useMemo<ValorContextoAuth>(
+    () => ({ autenticado, iniciarSesion, cerrarSesion }),
+    [autenticado, iniciarSesion, cerrarSesion],
   );
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return <ContextoAuth.Provider value={valor}>{children}</ContextoAuth.Provider>;
 }
 
-export function useAuth(): AuthContextValue {
-  const context = useContext(AuthContext);
-  if (context === null) {
-    throw new Error('useAuth must be used inside an AuthProvider.');
+export function useAuth(): ValorContextoAuth {
+  const contexto = useContext(ContextoAuth);
+  if (contexto === null) {
+    throw new Error('useAuth debe usarse dentro de un ProveedorAuth.');
   }
-  return context;
+  return contexto;
 }
