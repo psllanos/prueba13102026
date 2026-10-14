@@ -62,9 +62,10 @@ for Postgres to accept connections — it applies migrations at boot and does no
 
 ```bash
 # Seed providers so the endpoints have something to return.
-# Works in cmd, PowerShell, bash and Linux alike: it feeds a FILE, so it needs no shell
-# redirection, no `$(...)` command substitution and no heredoc.
-docker compose exec -T postgres psql -U postgres -d provider_optimizer < scripts/seed.sql
+# This form works in every shell, including cmd.exe: it copies the file INTO the container and
+# runs it with psql's own -f flag, so it uses no redirection, no `$(...)` and no heredoc.
+docker compose cp scripts/seed.sql postgres:/tmp/seed.sql
+docker compose exec -T postgres psql -U postgres -d provider_optimizer -f /tmp/seed.sql
 
 curl -s "http://localhost:8080/providers/available?serviceType=tow-truck&latitude=4.711&longitude=-74.0721&radiusKm=10"
 
@@ -74,18 +75,37 @@ curl -s -X POST http://localhost:8080/optimize \
 ```
 
 <details>
-<summary><strong>Windows: a bash heredoc will not work here</strong></summary>
+<summary><strong>Windows: which shell constructs work, and which silently fail</strong></summary>
 
-An earlier version of this README used `docker exec -i $(docker compose ps -q postgres) psql ... <<'SQL'`.
-Both constructs are **bash-only**, and this repository may be opened from `cmd.exe` or PowerShell:
+The `cmd.exe` pitfall is nastier than a syntax error. This command LOOKS like it works but does
+nothing:
 
-| Construct | `cmd.exe` | PowerShell | bash |
-|---|---|---|---|
-| `<<'SQL'` heredoc | ❌ *"No se esperaba << en este momento"* | ❌ | ✅ |
-| `$(...)` substitution | ❌ | ✅ | ✅ |
+```cmd
+docker compose exec -T postgres psql -U postgres -d provider_optimizer < scripts/seed.sql
+```
 
-The file-based command above works everywhere. If you are already in `bash`/WSL and prefer the
-shell-native form, it is equivalent:
+`<` is not an input redirect in `cmd.exe`. cmd passes `"<"` and `"scripts/seed.sql"` to `psql` as
+literal arguments, so `psql` prints:
+
+```
+psql: warning: extra command-line argument "<" ignored
+psql: warning: extra command-line argument "scripts/seed.sql" ignored
+```
+
+...and then exits **successfully without seeding anything**. There is no error code to catch; the
+next API call just returns an empty list.
+
+| Construct | `cmd.exe` | PowerShell | bash / Git Bash | Linux |
+|---|---|---|---|---|
+| `< file` input redirect | ❌ silently ignored | ❌ | ✅ | ✅ |
+| `<<'SQL'` heredoc | ❌ syntax error | ❌ | ✅ | ✅ |
+| `$(...)` substitution | ❌ | ✅ | ✅ | ✅ |
+| `psql -f file` inside the container | ✅ | ✅ | ✅ | ✅ |
+
+The `docker compose cp` + `-f` form documented above is the only one that works everywhere, which
+is why it is the primary instruction.
+
+**If you are in bash or Git Bash**, the shorter equivalent is fine:
 
 ```bash
 docker compose exec -T postgres psql -U postgres -d provider_optimizer < scripts/seed.sql
