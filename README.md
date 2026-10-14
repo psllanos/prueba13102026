@@ -161,6 +161,16 @@ Tres decisiones sostienen el diseño:
 | El repositorio es un **pre-filtro grueso**, no la autoridad | El filtrado SQL no se puede testear; un test de contrato prueba que el pre-filtro coincide con la regla de dominio |
 | Un caso **no se puede representar sin su decisión** (`breakdown jsonb NOT NULL`) | La garantía es estructural, no una verificación que alguien tiene que recordar |
 
+### Diagrama interactivo
+
+[`arquitectura.provideroptimizer.html`](arquitectura.provideroptimizer.html) — diagrama de
+arquitectura navegable (abrilo en el navegador, no requiere servidor). Permite cambiar tema
+claro/oscuro, hacer zoom y foco por componente, y recorrer tres vistas guiadas: camino principal,
+decisión del optimizador y trabajo asíncrono.
+
+El diagrama se genera desde [`arquitectura.provideroptimizer.json`](arquitectura.provideroptimizer.json),
+que es la fuente de verdad y se puede editar y volver a renderizar.
+
 ---
 
 ## Estructura
@@ -170,6 +180,7 @@ src/            Proyectos de Clean Architecture (Domain, Application, Infrastruc
 tests/          Suite unitaria y de integración
 frontend/       Cliente React (TypeScript, Vite) con mapa y tabla de proveedores
 scripts/        Datos de ejemplo para desarrollo
+arquitectura.provideroptimizer.*   Diagrama de arquitectura (HTML navegable + fuente JSON)
 openspec/       Cambio guiado por especificación: proposal, design, specs, tasks
 .github/        Pipeline de CI
 ```

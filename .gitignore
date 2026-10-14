@@ -22,6 +22,9 @@ appsettings.*.local.json
 # Exercise brief: recruitment material, deliberately not published with the solution
 PRUEBA T*.pdf
 
+# Archify visual-check evidence (regenerated on demand; screenshots are not an artifact)
+*.visual-check.*
+
 # Node (the optional React client lives in frontend/)
 node_modules/
 dist/

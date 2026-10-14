@@ -1,0 +1,406 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "ProviderOptimizer — Arquitectura de microservicios",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "camino-principal",
+        "label": "Camino principal",
+        "focus": [
+          "movil",
+          "cdn",
+          "gateway",
+          "assistance",
+          "optimizer",
+          "rds",
+          "redis"
+        ],
+        "note": "Del pedido del cliente hasta la decisión persistida."
+      },
+      {
+        "id": "decision-optimizador",
+        "label": "Decisión del optimizador",
+        "focus": [
+          "optimizer",
+          "redis",
+          "rds"
+        ],
+        "note": "El microservicio implementado en esta prueba."
+      },
+      {
+        "id": "trabajo-asincrono",
+        "label": "Trabajo asíncrono",
+        "focus": [
+          "optimizer",
+          "cola",
+          "notifications",
+          "location"
+        ],
+        "note": "Notificación y seguimiento fuera del camino crítico."
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "movil",
+      "type": "external",
+      "label": "App móvil",
+      "sublabel": "cliente",
+      "pos": [
+        40,
+        300
+      ],
+      "size": [
+        130,
+        62
+      ]
+    },
+    {
+      "id": "cdn",
+      "type": "cloud",
+      "label": "CloudFront",
+      "sublabel": "CDN",
+      "pos": [
+        230,
+        300
+      ],
+      "size": [
+        130,
+        62
+      ]
+    },
+    {
+      "id": "waf",
+      "type": "security",
+      "label": "AWS WAF",
+      "sublabel": "OWASP Top 10",
+      "pos": [
+        230,
+        110
+      ],
+      "size": [
+        130,
+        62
+      ],
+      "tag": "rate limit"
+    },
+    {
+      "id": "gateway",
+      "type": "security",
+      "label": "API Gateway",
+      "sublabel": "JWT / OAuth2",
+      "pos": [
+        420,
+        300
+      ],
+      "size": [
+        130,
+        62
+      ],
+      "tag": "autz + LB"
+    },
+    {
+      "id": "assistance",
+      "type": "backend",
+      "label": "AssistanceRequest",
+      "sublabel": "solicitudes",
+      "pos": [
+        640,
+        110
+      ],
+      "size": [
+        150,
+        62
+      ]
+    },
+    {
+      "id": "optimizer",
+      "type": "backend",
+      "label": "ProviderOptimizer",
+      "sublabel": "selección óptima",
+      "pos": [
+        640,
+        300
+      ],
+      "size": [
+        150,
+        62
+      ],
+      "tag": "implementado"
+    },
+    {
+      "id": "location",
+      "type": "backend",
+      "label": "LocationService",
+      "sublabel": "geolocalización",
+      "pos": [
+        640,
+        512
+      ],
+      "size": [
+        150,
+        62
+      ]
+    },
+    {
+      "id": "redis",
+      "type": "database",
+      "label": "ElastiCache Redis",
+      "sublabel": "caché de proveedores",
+      "pos": [
+        880,
+        452
+      ],
+      "size": [
+        150,
+        62
+      ]
+    },
+    {
+      "id": "rds",
+      "type": "database",
+      "label": "RDS PostgreSQL",
+      "sublabel": "casos + decisiones",
+      "pos": [
+        880,
+        300
+      ],
+      "size": [
+        150,
+        62
+      ],
+      "tag": "jsonb NOT NULL"
+    },
+    {
+      "id": "cola",
+      "type": "messagebus",
+      "label": "SQS + SNS",
+      "sublabel": "eventos",
+      "pos": [
+        880,
+        110
+      ],
+      "size": [
+        150,
+        62
+      ],
+      "tag": "pub/sub"
+    },
+    {
+      "id": "notifications",
+      "type": "backend",
+      "label": "Notifications",
+      "sublabel": "push al proveedor",
+      "pos": [
+        1120,
+        110
+      ],
+      "size": [
+        150,
+        62
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "AWS · región única · observabilidad transversal",
+      "wraps": [
+        "cdn",
+        "waf",
+        "gateway",
+        "assistance",
+        "optimizer",
+        "location",
+        "redis",
+        "rds",
+        "cola",
+        "notifications"
+      ]
+    },
+    {
+      "kind": "security-group",
+      "label": "Borde público :443",
+      "wraps": [
+        "cdn",
+        "waf",
+        "gateway"
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "movil-cdn",
+      "from": "movil",
+      "to": "cdn",
+      "label": "HTTPS",
+      "variant": "emphasis"
+    },
+    {
+      "id": "cdn-waf",
+      "from": "cdn",
+      "to": "waf",
+      "label": "inspección",
+      "variant": "security",
+      "fromSide": "top",
+      "toSide": "bottom",
+      "labelDy": -14
+    },
+    {
+      "id": "cdn-gateway",
+      "from": "cdn",
+      "to": "gateway"
+    },
+    {
+      "id": "gateway-assistance",
+      "from": "gateway",
+      "to": "assistance",
+      "label": "REST",
+      "fromSide": "top",
+      "toSide": "left",
+      "labelAt": [
+        520,
+        150
+      ]
+    },
+    {
+      "id": "gateway-optimizer",
+      "from": "gateway",
+      "to": "optimizer",
+      "label": "/optimize",
+      "variant": "emphasis",
+      "fromSide": "right",
+      "toSide": "left",
+      "labelAt": [
+        580,
+        332
+      ]
+    },
+    {
+      "id": "gateway-location",
+      "from": "gateway",
+      "to": "location",
+      "label": "REST",
+      "fromSide": "bottom",
+      "toSide": "left"
+    },
+    {
+      "id": "assistance-cola",
+      "from": "assistance",
+      "to": "cola",
+      "label": "asistencia.solicitada",
+      "variant": "dashed",
+      "fromSide": "right",
+      "toSide": "left",
+      "labelAt": [
+        825,
+        82
+      ]
+    },
+    {
+      "id": "optimizer-rds",
+      "from": "optimizer",
+      "to": "rds",
+      "label": "caso + decisión",
+      "variant": "emphasis",
+      "fromSide": "right",
+      "toSide": "left",
+      "labelAt": [
+        825,
+        270
+      ]
+    },
+    {
+      "id": "optimizer-redis",
+      "from": "optimizer",
+      "to": "redis",
+      "label": "candidatos",
+      "fromSide": "bottom",
+      "toSide": "left",
+      "labelAt": [
+        770,
+        432
+      ]
+    },
+    {
+      "id": "optimizer-location",
+      "from": "optimizer",
+      "to": "location",
+      "label": "validar ubicación",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "labelAt": [
+        700,
+        424
+      ]
+    },
+    {
+      "id": "optimizer-cola",
+      "from": "optimizer",
+      "to": "cola",
+      "label": "proveedor.elegido",
+      "variant": "dashed",
+      "fromSide": "top",
+      "toSide": "bottom",
+      "labelDy": -1,
+      "labelDx": -70
+    },
+    {
+      "id": "cola-notifications",
+      "from": "cola",
+      "to": "notifications",
+      "label": "notificar",
+      "variant": "dashed",
+      "fromSide": "right",
+      "toSide": "left",
+      "labelAt": [
+        1065,
+        82
+      ]
+    },
+    {
+      "id": "location-notifications",
+      "from": "location",
+      "to": "notifications",
+      "label": "posición",
+      "variant": "dashed",
+      "fromSide": "right",
+      "toSide": "bottom",
+      "labelAt": [
+        1080,
+        452
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "Implementado en esta prueba",
+      "items": [
+        "ProviderOptimizerService en .NET 8 con Clean Architecture",
+        "POST /optimize y GET /providers/available",
+        "40 tests: 21 unitarios + 19 contra Postgres real"
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "Decisiones que sostienen el diseño",
+      "items": [
+        "Elegibilidad y scoring son dominio puro, sin SQL ni reloj",
+        "El repositorio es pre-filtro, no la autoridad de la regla",
+        "El desglose del puntaje hace la decisión auditable"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Seguridad y límites",
+      "items": [
+        "JWT/OAuth2 en el borde; la API todavía no lo verifica",
+        "Secretos sólo por entorno, con fallo al arrancar",
+        "Sin autenticación real: no exponer públicamente"
+      ]
+    }
+  ]
+}
